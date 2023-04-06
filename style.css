@@ -1,0 +1,39 @@
+body {
+    font-family: 'Montserrat';
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+    overflow-x: hidden;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #000000;
+    align-items: center;
+    font-weight: 1000;
+    padding: 7px;
+    width: 100%;
+    color: aliceblue;
+    font-size: 32px;
+}
+
+.game-board {
+    margin-top: 100px;
+    display: grid;
+    position: relative;
+    justify-content: center;
+    grid-template-rows: repeat(3, minmax(75px, 100px));
+    grid-template-columns: repeat(3, minmax(75px, 100px));
+    gap: 12px;
+}
+
+.gameBox {
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
