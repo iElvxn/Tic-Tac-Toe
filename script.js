@@ -79,14 +79,31 @@ const gameBoard = (() => {
         }  
     }
 
-    return{ checkWinner, setMark, getMark, roundOver, checkStalemate };
+    const aiMove = () => {
+        //find possible move, then make random move.
+        let possibleMoves = [];
+
+        for(let i = 0; i < board.length; i++){
+            if(board[i] === ''){
+                possibleMoves.push(i);
+            }
+        }
+        gameBoard.setMark(possibleMoves[Math.floor(Math.random() * possibleMoves.length)], player2.getMark());
+        let oImage = document.createElement('img');
+        oImage.classList.add('markers');
+        oImage.src = 'images/O.png';
+        box.appendChild(oImage);
+        turn = 1
+    }
+
+    return{ checkWinner, setMark, getMark, roundOver, checkStalemate, aiMove };
 })();
 
 
 const gameBoxes = document.querySelectorAll('.gameBox');
 const player1 = Player('Joe', 'X', 'Player');
-const player2 = Player('Box', 'O', 'Player');
-//const player2 = Player('Bob', 'O', 'AI');
+//const player2 = Player('Box', 'O', 'Player');
+const player2 = Player('Bob', 'O', 'AI');
 let turn = 1;
 let gameCompleted = false;
 
@@ -120,7 +137,7 @@ gameBoxes.forEach(box =>{
                 gameBoard.checkWinner(player1, player2);
             }
             // if the User wants to play against an AI
-            if(player2.getType === 'AI'){
+            if(player2.getType() === 'AI'){
                 if(turn === 1){
                     if(gameBoard.getMark(e.target.dataset.index) != 'X' && gameBoard.getMark(e.target.dataset.index) != 'O'){
                         gameBoard.setMark(e.target.dataset.index, player1.getMark());
@@ -130,6 +147,7 @@ gameBoxes.forEach(box =>{
                         box.appendChild(xImage);
                         turn = 2
                         //then maybe call the bot move here.
+                        gameBoard.aiMove()
                     }
                 }
             }
