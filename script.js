@@ -88,10 +88,12 @@ const gameBoard = (() => {
                 possibleMoves.push(i);
             }
         }
-        gameBoard.setMark(possibleMoves[Math.floor(Math.random() * possibleMoves.length)], player2.getMark());
+        let randomIndex = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        gameBoard.setMark(possibleMoves[randomIndex], player2.getMark());
         let oImage = document.createElement('img');
         oImage.classList.add('markers');
         oImage.src = 'images/O.png';
+        //box = querySelector('[data-index=]')
         box.appendChild(oImage);
         turn = 1
     }
@@ -147,7 +149,7 @@ gameBoxes.forEach(box =>{
                         box.appendChild(xImage);
                         turn = 2
                         //then maybe call the bot move here.
-                        gameBoard.aiMove()
+                        gameBoard.aiMove();
                     }
                 }
             }
