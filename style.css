@@ -18,8 +18,36 @@ body {
     font-size: 32px;
 }
 
+.selections {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 30px;
+    gap: 10px;
+    font-family: 'Montserrat';
+}
+
+#selection-header {
+    color: #f1f1f1;
+    font-weight: 1000;
+    font-size: 24px;
+}
+
+.btns {
+    font-family: 'Montserrat';
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 125px;
+    height: 37px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 7px;
+}
+
 .game-board {
-    margin-top: 100px;
+    /*margin-top: 200px;*/
     display: grid;
     position: relative;
     justify-content: center;
@@ -36,4 +64,9 @@ body {
     border-radius: 10px;
     background-color: #f1f1f1;
     cursor: pointer;
+}
+
+.markers {
+    max-width: 69%;
+    max-height: 69%;
 }
