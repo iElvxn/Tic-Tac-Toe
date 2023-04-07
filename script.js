@@ -80,22 +80,29 @@ const gameBoard = (() => {
     }
 
     const aiMove = () => {
-        //find possible move, then make random move.
-        let possibleMoves = [];
+        if(gameCompleted == false){
+            let possibleMoves = [];
 
-        for(let i = 0; i < board.length; i++){
-            if(board[i] === ''){
-                possibleMoves.push(i);
+            for(let i = 0; i < board.length; i++){
+                if(board[i] === ''){
+                    possibleMoves.push(i);
+                }
             }
+            let randomIndex = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            gameBoard.setMark(randomIndex, player2.getMark());
+            let oImage = document.createElement('img');
+            oImage.classList.add('markers');
+            oImage.src = 'images/O.png';
+
+            const boxes = document.querySelectorAll('.gameBox');
+            boxes.forEach(box => {
+                if(parseInt(box.getAttribute('data-index')) === randomIndex){
+                    box.appendChild(oImage);
+                }
+            })
+            gameBoard.checkWinner(player1, player2);
+            turn = 1;
         }
-        let randomIndex = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        gameBoard.setMark(possibleMoves[randomIndex], player2.getMark());
-        let oImage = document.createElement('img');
-        oImage.classList.add('markers');
-        oImage.src = 'images/O.png';
-        //box = querySelector('[data-index=]')
-        box.appendChild(oImage);
-        turn = 1
     }
 
     return{ checkWinner, setMark, getMark, roundOver, checkStalemate, aiMove };
@@ -105,9 +112,23 @@ const gameBoard = (() => {
 const gameBoxes = document.querySelectorAll('.gameBox');
 const player1 = Player('Joe', 'X', 'Player');
 //const player2 = Player('Box', 'O', 'Player');
-const player2 = Player('Bob', 'O', 'AI');
+//const player2 = Player('Bob', 'O', 'AI');
 let turn = 1;
 let gameCompleted = false;
+
+const playerSelectionBtn = document.getElementById('plr-btn');
+const aiSelectionBtn = document.getElementById('ai-btn');
+
+//add a thing that tells user to choose opponent first
+let player2;
+playerSelectionBtn.addEventListener('click', () => {
+    player2 = Player('Bob', 'O', 'Player');
+})
+
+aiSelectionBtn.addEventListener('click', () => {
+    player2 = Player('Bob', 'O', 'AI');
+})
+
 
 gameBoxes.forEach(box =>{
     box.addEventListener('click', e => {
@@ -141,15 +162,16 @@ gameBoxes.forEach(box =>{
             // if the User wants to play against an AI
             if(player2.getType() === 'AI'){
                 if(turn === 1){
-                    if(gameBoard.getMark(e.target.dataset.index) != 'X' && gameBoard.getMark(e.target.dataset.index) != 'O'){
+                    if(gameBoard.getMark(e.target.dataset.index) === ''){
                         gameBoard.setMark(e.target.dataset.index, player1.getMark());
                         let xImage = document.createElement('img'); //can prob put in the gameboard module
                         xImage.classList.add('markers');
                         xImage.src = 'images/X.png';
                         box.appendChild(xImage);
                         turn = 2
-                        //then maybe call the bot move here.
+                        gameBoard.checkWinner(player1, player2);
                         gameBoard.aiMove();
+                        
                     }
                 }
             }
