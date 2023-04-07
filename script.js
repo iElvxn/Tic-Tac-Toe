@@ -129,8 +129,6 @@ const gameBoard = (() => {
                 }
             }
         }else {body.innerHTML = 'How boring, you stalemated?';}
-
-        //event.preventDefault();
         if(modal == null) return;
         modal.classList.add('active');
         overlay.classList.add('active');
