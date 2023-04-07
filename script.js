@@ -18,21 +18,22 @@ const gameBoard = (() => {
     }
 
     const checkStalemate = () => {
-        let stalemate = false;
-        let notNullCount = 0
+        if(gameCompleted === false){
+            let stalemate = false;
+            let marked = 0;
 
-        board.forEach(box => {
-            if(box != ""){
-                notNullCount++
+            board.forEach(box => {
+                if(box != ""){
+                    marked++;
+                }
+            })
+
+            if(marked === 9){
+                stalemate = true;
+                gameCompleted = true;
+                roundOver(null, null, 'stalemate');
             }
-        })
-
-        if(notNullCount === 9){
-            stalemate = true
-        }else{
-            stalemate = false
         }
-        return(stalemate);
     }
 
     const checkWinner = (player1, player2) => {
@@ -45,7 +46,7 @@ const gameBoard = (() => {
             [2,5,8],
             [0,4,8],
             [2,4,6]
-        ]
+        ];
         winningCombos.forEach(combos => {
             let xCount = 0;
             let oCount = 0;
@@ -59,12 +60,8 @@ const gameBoard = (() => {
                     oCount++;
                     if(oCount === 3){roundOver(player2, player2.getMark(), 'win')}
                 }
+                setTimeout(checkStalemate, 10);
             })
-            if(xCount != 3 && oCount != 3){
-                if(checkStalemate() == true){
-                    roundOver(null, null, 'stalemate')
-                } 
-            }
         })
     }
 
@@ -76,7 +73,8 @@ const gameBoard = (() => {
             if(result === 'stalemate'){
                 console.log('Stalemate');
             }
-        }  
+        } 
+        endScreen(winner, result);
     }
 
     const aiMove = () => {
@@ -105,14 +103,43 @@ const gameBoard = (() => {
         }
     }
 
-    return{ checkWinner, setMark, getMark, roundOver, checkStalemate, aiMove };
+    const restart = () => {
+        board = ["", "", "", "", "", "", "", "", ""];
+        gameCompleted = false;
+        turn = 1;
+        const boxes = document.querySelectorAll('.gameBox');
+        boxes.forEach(box => {
+            while (box.firstChild) {
+                box.removeChild(box.firstChild);
+            }
+        })
+    }
+    const endScreen = (winner, result) => {
+        const body = document.querySelector('.modal-body');
+        if(result === 'win'){
+            if(winner === player1){
+                body.innerHTML = 'Player 1 has won!';
+            }else{
+                if(player2.getType() === 'Player'){
+                    body.innerHTML = 'Player 2 has won!';
+                }else {
+                    body.innerHTML = 'Yikes, how did you lose to an A.I?';
+                }
+            }
+        }else {body.innerHTML = 'How boring, you stalemated?';}
+
+        //event.preventDefault();
+        if(modal == null) return;
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    return{ checkWinner, setMark, getMark, roundOver, checkStalemate, aiMove, restart, endScreen };
 })();
 
 
 const gameBoxes = document.querySelectorAll('.gameBox');
 const player1 = Player('Joe', 'X', 'Player');
-//const player2 = Player('Box', 'O', 'Player');
-//const player2 = Player('Bob', 'O', 'AI');
 let turn = 1;
 let gameCompleted = false;
 
@@ -122,13 +149,27 @@ const aiSelectionBtn = document.getElementById('ai-btn');
 //add a thing that tells user to choose opponent first
 let player2;
 playerSelectionBtn.addEventListener('click', () => {
-    player2 = Player('Bob', 'O', 'Player');
+    if(playerSelectionBtn.classList != 'selected-btn'){
+        player2 = Player('Bob', 'O', 'Player');
+        playerSelectionBtn.classList.add('selected-btn');
+        aiSelectionBtn.classList.remove('selected-btn');
+        gameBoard.restart();
+    }
 })
 
 aiSelectionBtn.addEventListener('click', () => {
-    player2 = Player('Bob', 'O', 'AI');
+    if(aiSelectionBtn.classList != 'selected-btn'){
+        player2 = Player('Bob', 'O', 'AI');
+        aiSelectionBtn.classList.add('selected-btn');
+        playerSelectionBtn.classList.remove('selected-btn');
+        gameBoard.restart();
+    } 
 })
 
+const restartBtn = document.getElementById('restart-btn');
+restartBtn.addEventListener('click', () => {
+    gameBoard.restart();
+})
 
 gameBoxes.forEach(box =>{
     box.addEventListener('click', e => {
@@ -137,10 +178,12 @@ gameBoxes.forEach(box =>{
             if(player2.getType() === 'Player'){
                 if(turn === 1){
                     if(gameBoard.getMark(e.target.dataset.index) === ''){
-                        console.log('1')
                         gameBoard.setMark(e.target.dataset.index, player1.getMark());
                         let xImage = document.createElement('img');
                         xImage.classList.add('markers');
+                        setTimeout(() => {
+                            xImage.classList.add('active');
+                        }, 1);
                         xImage.src = 'images/X.png';
                         box.appendChild(xImage);
                         turn = 2
@@ -148,10 +191,12 @@ gameBoxes.forEach(box =>{
     
                 }else { //turn 2
                     if(gameBoard.getMark(e.target.dataset.index) === ''){
-                        console.log('2')
                         gameBoard.setMark(e.target.dataset.index, player2.getMark());
                         let oImage = document.createElement('img');
                         oImage.classList.add('markers');
+                        setTimeout(() => {
+                            oImage.classList.add('active');
+                        }, 1);
                         oImage.src = 'images/O.png';
                         box.appendChild(oImage);
                         turn = 1
@@ -164,13 +209,14 @@ gameBoxes.forEach(box =>{
                 if(turn === 1){
                     if(gameBoard.getMark(e.target.dataset.index) === ''){
                         gameBoard.setMark(e.target.dataset.index, player1.getMark());
-                        let xImage = document.createElement('img'); //can prob put in the gameboard module
+                        let xImage = document.createElement('img'); 
                         xImage.classList.add('markers');
                         xImage.src = 'images/X.png';
                         box.appendChild(xImage);
                         turn = 2
                         gameBoard.checkWinner(player1, player2);
-                        gameBoard.aiMove();
+                        
+                        setTimeout(gameBoard.aiMove, 177); //delays the AI move a lil bit
                         
                     }
                 }
@@ -178,4 +224,21 @@ gameBoxes.forEach(box =>{
         }
     })
 });
+
+const closeModalButtons = document.querySelectorAll('[data-close-button');
+const overlay = document.querySelector('.overlay');
+
+closeModalButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const modal = button.closest('.modal')
+        closeModal(modal);
+    })
+})
+
+function closeModal(modal){
+    event.preventDefault();
+    if(modal == null) return;
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+}
 
