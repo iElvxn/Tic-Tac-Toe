@@ -88,13 +88,15 @@ const gameBoard = (() => {
             }
             let randomIndex = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
             gameBoard.setMark(randomIndex, player2.getMark());
-            let oImage = document.createElement('img');
-            oImage.classList.add('markers');
-            oImage.src = 'images/O.png';
-
             const boxes = document.querySelectorAll('.gameBox');
             boxes.forEach(box => {
                 if(parseInt(box.getAttribute('data-index')) === randomIndex){
+                    let oImage = document.createElement('img');
+                    oImage.classList.add('markers');
+                    oImage.src = 'images/O.png';
+                    setTimeout(() => {
+                        oImage.classList.add('active');
+                    }, 177); // this also includes the delay for the bot to make a move
                     box.appendChild(oImage);
                 }
             })
@@ -210,13 +212,17 @@ gameBoxes.forEach(box =>{
                     if(gameBoard.getMark(e.target.dataset.index) === ''){
                         gameBoard.setMark(e.target.dataset.index, player1.getMark());
                         let xImage = document.createElement('img'); 
+                        setTimeout(() => {
+                            xImage.classList.add('active');
+                        }, 1);
                         xImage.classList.add('markers');
                         xImage.src = 'images/X.png';
                         box.appendChild(xImage);
                         turn = 2
                         gameBoard.checkWinner(player1, player2);
                         
-                        setTimeout(gameBoard.aiMove, 177); //delays the AI move a lil bit
+                        //setTimeout(gameBoard.aiMove, 177); //delays the AI move a lil bit
+                        gameBoard.aiMove();
                         
                     }
                 }
